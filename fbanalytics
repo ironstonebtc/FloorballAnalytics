@@ -1,0 +1,82 @@
+import pygame
+import sys
+
+# Define the size of the window
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
+
+# Define the colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+
+# Define the font
+FONT = pygame.font.SysFont("Arial", 20)
+
+# Load the image of the rink
+rink = pygame.image.load("rink.png")
+
+# Create the window
+screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+
+# Set the title of the window
+pygame.display.set_caption("Innebandymål")
+
+# Create a list to store the events
+events = []
+
+# Start the main loop
+while True:
+    # Get the events from the event queue
+    events = pygame.event.get()
+
+    # Check for the quit event
+    for event in events:
+        if event.type == pygame.QUIT:
+            sys.exit()
+
+    # Clear the screen
+    screen.fill(BLACK)
+
+    # Draw the rink
+    screen.blit(rink, (0, 0))
+
+    # Get the mouse position
+    mouse_position = pygame.mouse.get_pos()
+
+    # Draw a circle at the mouse position
+    pygame.draw.circle(screen, RED, mouse_position, 10)
+
+    # Display the event log
+    event_log = FONT.render("Events:", True, WHITE)
+    screen.blit(event_log, (10, 10))
+
+    for event in events:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # Get the mouse button that was pressed
+            mouse_button = event.button
+
+            # Check if the left mouse button was pressed
+            if mouse_button == 1:
+                # Get the coordinate of the mouse position
+                coordinate = mouse_position
+
+                # Get the text of the event
+                event_text = "Assist" if mouse_button == 1 else "Goal"
+
+                # Add the event to the list
+                events.append((coordinate, event_text))
+
+    # Display the events
+    for coordinate, event_text in events:
+        event_text = FONT.render(event_text, True, WHITE)
+        screen.blit(event_text, (10, 30 + 20 * len(events)))
+
+    # Update the display
+    pygame.display.update()
+
+# Save the event log to an Excel file
+with open("event_log.xlsx", "w") as f:
+    for coordinate, event_text in events:
+        f.write("{},{}\n".format(coordinate[0], coordinate[1], event_text))
